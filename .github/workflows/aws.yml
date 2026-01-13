@@ -18,9 +18,9 @@ jobs:
           aws-region: us-east-1
       - name: Enumerate allowed actions (quick test)
         run: |
-        aws iam list-roles || true
-        aws iam list-users || true
-        aws sts get-caller-identity
+          aws iam list-roles || true
+          aws iam list-users || true
+          aws sts get-caller-identity
       - name: Read the flag
         run: |
           aws secretsmanager get-secret-value --secret-id flag
