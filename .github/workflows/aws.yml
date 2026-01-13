@@ -1,29 +1,31 @@
-name: "test AWS Access"
+name: ARTE STS Lab 2.2.2
 
-# The workflow should only trigger on pull requests to the main branch
 on:
-  pull_request:
-    branches:
-      - main
+  workflow_dispatch:
 
-# Required to get the ID Token that will be used for OIDC
 permissions:
   id-token: write
-  contents: read # needed for private repos to checkout
+  contents: read
 
 jobs:
-  aws:
+  assume-role-and-read-secret:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-region: eu-west-1
-          role-to-assume:${{ secrets.READ_ROLE }}
-          role-session-name: OIDCSession
+          role-to-assume: arn:aws:iam::276821357134:role/sts-lab-2-target
+          aws-region: us-east-1
 
-      - run: aws sts get-caller-identity
-        shell: bash
+      - name: Enumerate whoami
+        run: aws sts get-caller-identity
+
+      - name: Try to read secrets
+        run: |
+          # adjust to lab hint: Secrets Manager or SSM Parameter Store
+          aws secretsmanager list-secrets
+          # if lab mentions a specific secret name, do:
+          # aws secretsmanager get-secret-value --secret-id <NAME>
