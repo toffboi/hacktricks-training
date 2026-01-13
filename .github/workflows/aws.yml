@@ -28,4 +28,4 @@ jobs:
           # adjust to lab hint: Secrets Manager or SSM Parameter Store
           aws secretsmanager list-secrets
           # if lab mentions a specific secret name, do:
-          # aws secretsmanager get-secret-value --secret-id <NAME>
+          # aws secretsmanager get-secret-value --secret-id flag_sts_lab_2
